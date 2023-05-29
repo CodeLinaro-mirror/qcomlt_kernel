@@ -30,6 +30,9 @@ enum {
 
 #define CBF_MUX_OFFSET		0x18
 #define CBF_MUX_PARENT_MASK		GENMASK(1, 0)
+#define CBF_MUX_AUTO_CLK_SEL_ALWAYS_ON_MASK GENMASK(5, 4)
+#define CBF_MUX_AUTO_CLK_SEL_ALWAYS_ON_GPLL0_SEL \
+	FIELD_PREP(CBF_MUX_AUTO_CLK_SEL_ALWAYS_ON_MASK, 0x03)
 #define CBF_MUX_AUTO_CLK_SEL_BIT	BIT(6)
 
 #define CBF_PLL_OFFSET 0xf000
@@ -99,29 +102,21 @@ struct clk_cbf_8996_mux {
 	struct clk_regmap clkr;
 };
 
+static struct clk_cbf_8996_mux *to_clk_cbf_8996_mux(struct clk_regmap *clkr)
+{
+	return container_of(clkr, struct clk_cbf_8996_mux, clkr);
+}
+
 static int cbf_clk_notifier_cb(struct notifier_block *nb, unsigned long event,
 			       void *data);
-static const struct clk_ops clk_cbf_8996_mux_ops;
-
-static struct clk_cbf_8996_mux cbf_mux = {
-	.reg = CBF_MUX_OFFSET,
-	.nb.notifier_call = cbf_clk_notifier_cb,
-	.clkr.hw.init = &(struct clk_init_data) {
-		.name = "cbf_mux",
-		.parent_data = cbf_mux_parent_data,
-		.num_parents = ARRAY_SIZE(cbf_mux_parent_data),
-		.ops = &clk_cbf_8996_mux_ops,
-		/* CPU clock is critical and should never be gated */
-		.flags = CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
-	},
-};
 
 static u8 clk_cbf_8996_mux_get_parent(struct clk_hw *hw)
 {
 	struct clk_regmap *clkr = to_clk_regmap(hw);
+	struct clk_cbf_8996_mux *mux = to_clk_cbf_8996_mux(clkr);
 	u32 val;
 
-	regmap_read(clkr->regmap, cbf_mux.reg, &val);
+	regmap_read(clkr->regmap, mux->reg, &val);
 
 	return FIELD_GET(CBF_MUX_PARENT_MASK, val);
 }
@@ -129,12 +124,12 @@ static u8 clk_cbf_8996_mux_get_parent(struct clk_hw *hw)
 static int clk_cbf_8996_mux_set_parent(struct clk_hw *hw, u8 index)
 {
 	struct clk_regmap *clkr = to_clk_regmap(hw);
+	struct clk_cbf_8996_mux *mux = to_clk_cbf_8996_mux(clkr);
 	u32 val;
 
-	pr_info("CBF: SET parent to %d\n", index);
 	val = FIELD_PREP(CBF_MUX_PARENT_MASK, index);
 
-	return regmap_update_bits(clkr->regmap, cbf_mux.reg, CBF_MUX_PARENT_MASK, val);
+	return regmap_update_bits(clkr->regmap, mux->reg, CBF_MUX_PARENT_MASK, val);
 }
 
 static int clk_cbf_8996_mux_determine_rate(struct clk_hw *hw,
@@ -165,36 +160,49 @@ static const struct clk_ops clk_cbf_8996_mux_ops = {
 	.determine_rate = clk_cbf_8996_mux_determine_rate,
 };
 
+static struct clk_cbf_8996_mux cbf_mux = {
+	.reg = CBF_MUX_OFFSET,
+	.nb.notifier_call = cbf_clk_notifier_cb,
+	.clkr.hw.init = &(struct clk_init_data) {
+		.name = "cbf_mux",
+		.parent_data = cbf_mux_parent_data,
+		.num_parents = ARRAY_SIZE(cbf_mux_parent_data),
+		.ops = &clk_cbf_8996_mux_ops,
+		/* CPU clock is critical and should never be gated */
+		.flags = CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
+	},
+};
+
 static int cbf_clk_notifier_cb(struct notifier_block *nb, unsigned long event,
 			       void *data)
 {
 	struct clk_notifier_data *cnd = data;
-	struct clk_hw *parent;
-	int ret;
 
 	switch (event) {
 	case PRE_RATE_CHANGE:
-		parent = clk_hw_get_parent_by_index(&cbf_mux.clkr.hw, CBF_DIV_INDEX);
-		ret = clk_cbf_8996_mux_set_parent(&cbf_mux.clkr.hw, CBF_DIV_INDEX);
-
-		if (cnd->old_rate > DIV_THRESHOLD && cnd->new_rate < DIV_THRESHOLD)
-			ret = clk_set_rate(parent->clk, cnd->old_rate / 2);
+		/*
+		 * Avoid overvolting. clk_core_set_rate_nolock() walks from top
+		 * to bottom, so it will change the rate of the PLL before
+		 * chaging the parent of PMUX. This can result in pmux getting
+		 * clocked twice the expected rate.
+		 *
+		 * Manually switch to PLL/2 here.
+		 */
+		if (cnd->old_rate > DIV_THRESHOLD &&
+		    cnd->new_rate < DIV_THRESHOLD)
+			clk_cbf_8996_mux_set_parent(&cbf_mux.clkr.hw, CBF_DIV_INDEX);
 		break;
-	case POST_RATE_CHANGE:
-		if (cnd->new_rate < DIV_THRESHOLD)
-			ret = clk_cbf_8996_mux_set_parent(&cbf_mux.clkr.hw, CBF_DIV_INDEX);
-		else {
-			parent = clk_hw_get_parent_by_index(&cbf_mux.clkr.hw, CBF_PLL_INDEX);
-			clk_set_rate(parent->clk, cnd->new_rate);
-			ret = clk_cbf_8996_mux_set_parent(&cbf_mux.clkr.hw, CBF_PLL_INDEX);
-		}
+	case ABORT_RATE_CHANGE:
+		/* Revert manual change */
+		if (cnd->new_rate < DIV_THRESHOLD &&
+		    cnd->old_rate > DIV_THRESHOLD)
+			clk_cbf_8996_mux_set_parent(&cbf_mux.clkr.hw, CBF_PLL_INDEX);
 		break;
 	default:
-		ret = 0;
 		break;
 	}
 
-	return notifier_from_errno(ret);
+	return notifier_from_errno(0);
 };
 
 static struct clk_hw *cbf_msm8996_hw_clks[] = {
@@ -236,10 +244,23 @@ static int qcom_msm8996_cbf_probe(struct platform_device *pdev)
 	/* Ensure write goes through before PLLs are reconfigured */
 	udelay(5);
 
+	/* Set the auto clock sel always-on source to GPLL0/2 (300MHz) */
+	regmap_update_bits(regmap, CBF_MUX_OFFSET,
+			   CBF_MUX_AUTO_CLK_SEL_ALWAYS_ON_MASK,
+			   CBF_MUX_AUTO_CLK_SEL_ALWAYS_ON_GPLL0_SEL);
+
 	clk_alpha_pll_configure(&cbf_pll, regmap, &cbfpll_config);
 
 	/* Wait for PLL(s) to lock */
-        udelay(50);
+	udelay(50);
+
+	/* Enable auto clock selection for CBF */
+	regmap_update_bits(regmap, CBF_MUX_OFFSET,
+			   CBF_MUX_AUTO_CLK_SEL_BIT,
+			   CBF_MUX_AUTO_CLK_SEL_BIT);
+
+	/* Ensure write goes through before muxes are switched */
+	udelay(5);
 
 	/* Switch CBF to use the primary PLL */
 	regmap_update_bits(regmap, CBF_MUX_OFFSET,
