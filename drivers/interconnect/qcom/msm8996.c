@@ -24,7 +24,14 @@
 static const char * const bus_mm_clocks[] = {
 	"bus",
 	"bus_a",
-	"iface"
+	"mmagic", "mmagic-cfg",
+	"mmagic-mdss", "mmagic-mdss-cfg",
+	"mmagic-camss", "mmagic-camss-cfg",
+	"mmagic-videoss", "mmagic-videoss-cfg",
+};
+
+static const char * const bus_mm_ahb_clocks[] = {
+	"iface",
 };
 
 static const char * const bus_a0noc_clocks[] = {
@@ -1968,10 +1975,31 @@ static struct qcom_icc_node *mnoc_nodes[] = {
 	[MASTER_VFE] = &mas_vfe,
 	[MASTER_SNOC_VMEM] = &mas_snoc_vmem,
 	[MASTER_VIDEO_P0_OCMEM] = &mas_venus_vmem,
-	[MASTER_CNOC_MNOC_MMSS_CFG] = &mas_cnoc_mnoc_mmss_cfg,
 	[SLAVE_MNOC_BIMC] = &slv_mnoc_bimc,
 	[SLAVE_VMEM] = &slv_vmem,
 	[SLAVE_SERVICE_MNOC] = &slv_srvc_mnoc,
+};
+
+static const struct regmap_config msm8996_mnoc_regmap_config = {
+	.reg_bits	= 32,
+	.reg_stride	= 4,
+	.val_bits	= 32,
+	.max_register	= 0x1c000,
+	.fast_io	= true
+};
+
+static const struct qcom_icc_desc msm8996_mnoc = {
+	.type = QCOM_ICC_NOC,
+	.nodes = mnoc_nodes,
+	.num_nodes = ARRAY_SIZE(mnoc_nodes),
+	.clocks = bus_mm_clocks,
+	.num_clocks = ARRAY_SIZE(bus_mm_clocks),
+	.num_rate_clocks = 2,
+	.regmap_cfg = &msm8996_mnoc_regmap_config
+};
+
+static struct qcom_icc_node *mnoc_ahb_nodes[] = {
+	[MASTER_CNOC_MNOC_MMSS_CFG] = &mas_cnoc_mnoc_mmss_cfg,
 	[SLAVE_MMAGIC_CFG] = &slv_mmagic_cfg,
 	[SLAVE_CPR_CFG] = &slv_cpr_cfg,
 	[SLAVE_MISC_CFG] = &slv_misc_cfg,
@@ -1995,21 +2023,13 @@ static struct qcom_icc_node *mnoc_nodes[] = {
 	[SLAVE_SMMU_VFE_CFG] = &slv_smmu_vfe_cfg
 };
 
-static const struct regmap_config msm8996_mnoc_regmap_config = {
-	.reg_bits	= 32,
-	.reg_stride	= 4,
-	.val_bits	= 32,
-	.max_register	= 0x1c000,
-	.fast_io	= true
-};
-
-static const struct qcom_icc_desc msm8996_mnoc = {
+static const struct qcom_icc_desc msm8996_mnoc_ahb = {
 	.type = QCOM_ICC_NOC,
-	.nodes = mnoc_nodes,
-	.num_nodes = ARRAY_SIZE(mnoc_nodes),
-	.clocks = bus_mm_clocks,
-	.num_clocks = ARRAY_SIZE(bus_mm_clocks),
-	.num_rate_clocks = 3,
+	.nodes = mnoc_ahb_nodes,
+	.num_nodes = ARRAY_SIZE(mnoc_ahb_nodes),
+	.clocks = bus_mm_ahb_clocks,
+	.num_clocks = ARRAY_SIZE(bus_mm_ahb_clocks),
+	.num_rate_clocks = 1,
 	.regmap_cfg = &msm8996_mnoc_regmap_config
 };
 
@@ -2100,6 +2120,7 @@ static const struct of_device_id qnoc_of_match[] = {
 	{ .compatible = "qcom,msm8996-bimc", .data = &msm8996_bimc},
 	{ .compatible = "qcom,msm8996-cnoc", .data = &msm8996_cnoc},
 	{ .compatible = "qcom,msm8996-mnoc", .data = &msm8996_mnoc},
+	{ .compatible = "qcom,msm8996-mnoc-ahb", .data = &msm8996_mnoc_ahb},
 	{ .compatible = "qcom,msm8996-pnoc", .data = &msm8996_pnoc},
 	{ .compatible = "qcom,msm8996-snoc", .data = &msm8996_snoc},
 	{ }
