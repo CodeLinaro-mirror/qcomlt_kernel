@@ -1823,6 +1823,7 @@ static const struct qcom_icc_desc msm8996_a0noc = {
 	.num_nodes = ARRAY_SIZE(a0noc_nodes),
 	.clocks = bus_a0noc_clocks,
 	.num_clocks = ARRAY_SIZE(bus_a0noc_clocks),
+	.num_rate_clocks = 0,
 	.has_bus_pd = true,
 	.regmap_cfg = &msm8996_a0noc_regmap_config
 };
@@ -1868,6 +1869,7 @@ static const struct qcom_icc_desc msm8996_a2noc = {
 	.num_nodes = ARRAY_SIZE(a2noc_nodes),
 	.clocks = bus_a2noc_clocks,
 	.num_clocks = ARRAY_SIZE(bus_a2noc_clocks),
+	.num_rate_clocks = 2,
 	.regmap_cfg = &msm8996_a2noc_regmap_config
 };
 
@@ -2007,6 +2009,7 @@ static const struct qcom_icc_desc msm8996_mnoc = {
 	.num_nodes = ARRAY_SIZE(mnoc_nodes),
 	.clocks = bus_mm_clocks,
 	.num_clocks = ARRAY_SIZE(bus_mm_clocks),
+	.num_rate_clocks = 3,
 	.regmap_cfg = &msm8996_mnoc_regmap_config
 };
 
