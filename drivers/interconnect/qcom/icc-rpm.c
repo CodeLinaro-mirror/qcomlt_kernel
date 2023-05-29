@@ -411,6 +411,9 @@ regmap_done:
 	for (i = 0; i < num_nodes; i++) {
 		size_t j;
 
+		if (!qnodes[i])
+			continue;
+
 		node = icc_node_create(qnodes[i]->id);
 		if (IS_ERR(node)) {
 			ret = PTR_ERR(node);

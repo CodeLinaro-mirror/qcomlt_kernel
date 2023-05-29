@@ -339,6 +339,11 @@ struct icc_node *of_icc_xlate_onecell(struct of_phandle_args *spec,
 		return ERR_PTR(-EINVAL);
 	}
 
+	if (!icc_data->nodes[idx]) {
+		pr_err("%s: non-defined index %u\n", __func__, idx);
+		return ERR_PTR(-EINVAL);
+	}
+
 	return icc_data->nodes[idx];
 }
 EXPORT_SYMBOL_GPL(of_icc_xlate_onecell);
