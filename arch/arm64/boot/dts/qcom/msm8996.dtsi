@@ -946,10 +946,28 @@
 			compatible = "qcom,msm8996-mnoc";
 			reg = <0x005a4000 0x1c000>;
 			#interconnect-cells = <1>;
-			clock-names = "bus", "bus_a", "iface";
+			clock-names = "bus", "bus_a",
+					"mmagic", "mmagic-cfg",
+					"mmagic-mdss", "mmagic-mdss-cfg",
+					"mmagic-camss", "mmagic-camss-cfg",
+					"mmagic-videoss", "mmagic-videoss-cfg";
 			clocks = <&rpmcc RPM_SMD_MMAXI_CLK>,
 				 <&rpmcc RPM_SMD_MMAXI_A_CLK>,
-				 <&mmcc AHB_CLK_SRC>;
+				 <&mmcc MMSS_MMAGIC_AHB_CLK>,
+				 <&mmcc MMSS_MMAGIC_CFG_AHB_CLK>,
+				 <&mmcc MMAGIC_MDSS_AXI_CLK>,
+				 <&mmcc MMAGIC_MDSS_NOC_CFG_AHB_CLK>,
+				 <&mmcc MMAGIC_CAMSS_AXI_CLK>,
+				 <&mmcc MMAGIC_CAMSS_NOC_CFG_AHB_CLK>,
+				 <&mmcc MMAGIC_VIDEO_AXI_CLK>,
+				 <&mmcc MMAGIC_VIDEO_NOC_CFG_AHB_CLK>;
+
+			mnoc_ahb: interconnect-virt {
+				compatible = "qcom,msm8996-mnoc-ahb";
+				#interconnect-cells = <1>;
+				clock-names = "iface";
+				clocks = <&mmcc AHB_CLK_SRC>;
+			};
 		};
 
 		pnoc: interconnect@5c0000 {
@@ -2327,7 +2345,7 @@
 				 <&mmcc VIDEO_MAXI_CLK>;
 			clock-names = "core", "iface", "bus", "mbus";
 			interconnects = <&mnoc MASTER_VIDEO_P0 &bimc SLAVE_EBI_CH0>,
-					<&bimc MASTER_AMPSS_M0 &mnoc SLAVE_VENUS_CFG>;
+					<&bimc MASTER_AMPSS_M0 &mnoc_ahb SLAVE_VENUS_CFG>;
 			interconnect-names = "video-mem", "cpu-cfg";
 			iommus = <&venus_smmu 0x00>,
 				 <&venus_smmu 0x01>,
