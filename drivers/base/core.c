@@ -700,6 +700,7 @@ struct device_link *device_link_add(struct device *consumer,
 	if (flags & DL_FLAG_PM_RUNTIME && flags & DL_FLAG_RPM_ACTIVE) {
 		if (pm_runtime_get_sync(supplier) < 0) {
 			pm_runtime_put_noidle(supplier);
+			dev_info(supplier, "could not resume device\n");
 			return NULL;
 		}
 	}
@@ -717,10 +718,16 @@ struct device_link *device_link_add(struct device *consumer,
 	 * SYNC_STATE_ONLY link, we don't check for reverse dependencies
 	 * because it only affects sync_state() callbacks.
 	 */
-	if (!device_pm_initialized(supplier)
-	    || (!(flags & DL_FLAG_SYNC_STATE_ONLY) &&
-		  device_is_dependent(consumer, supplier))) {
+	if (!device_pm_initialized(supplier)) {
 		link = NULL;
+		dev_err(supplier, "PM not initialized, can not link it\n");
+		goto out;
+	}
+
+	if (!(flags & DL_FLAG_SYNC_STATE_ONLY) &&
+		  device_is_dependent(consumer, supplier)) {
+		link = NULL;
+		dev_err(consumer, "can not link to dependent device %s\n", dev_name(supplier));
 		goto out;
 	}
 
@@ -732,6 +739,7 @@ struct device_link *device_link_add(struct device *consumer,
 	    consumer->links.status != DL_DEV_NO_DRIVER &&
 	    consumer->links.status != DL_DEV_PROBING) {
 		link = NULL;
+		dev_err(consumer, "not creating a useless sync-state link\n");
 		goto out;
 	}
 
@@ -823,6 +831,7 @@ struct device_link *device_link_add(struct device *consumer,
 	if (device_register(&link->link_dev)) {
 		put_device(&link->link_dev);
 		link = NULL;
+		dev_err(consumer, "failed to register link to %s\n", dev_name(consumer));
 		goto out;
 	}
 
