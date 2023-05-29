@@ -574,7 +574,7 @@ static int a4xx_pm_resume(struct msm_gpu *gpu) {
 	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
 	int ret;
 
-	ret = msm_gpu_pm_resume(gpu);
+	ret = msm_gpu_pm_resume_no_devfreq(gpu);
 	if (ret)
 		return ret;
 
@@ -587,6 +587,9 @@ static int a4xx_pm_resume(struct msm_gpu *gpu) {
 			reg = gpu_read(gpu, REG_A4XX_RBBM_POWER_STATUS);
 		} while (!(reg & A4XX_RBBM_POWER_CNTL_IP_SP_TP_PWR_ON));
 	}
+
+	msm_devfreq_resume(gpu);
+
 	return 0;
 }
 

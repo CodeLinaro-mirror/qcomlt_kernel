@@ -1354,7 +1354,7 @@ static int a5xx_pm_resume(struct msm_gpu *gpu)
 	}
 
 	/* Turn on the core power */
-	ret = msm_gpu_pm_resume(gpu);
+	ret = msm_gpu_pm_resume_no_devfreq(gpu);
 	if (ret)
 		return ret;
 
@@ -1390,6 +1390,8 @@ static int a5xx_pm_resume(struct msm_gpu *gpu)
 	if (ret)
 		DRM_ERROR("%s: timeout waiting for SP GDSC enable\n",
 			gpu->name);
+
+	msm_devfreq_resume(gpu);
 
 	return ret;
 }

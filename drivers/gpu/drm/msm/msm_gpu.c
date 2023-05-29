@@ -94,7 +94,7 @@ static int disable_axi(struct msm_gpu *gpu)
 	return 0;
 }
 
-int msm_gpu_pm_resume(struct msm_gpu *gpu)
+int msm_gpu_pm_resume_no_devfreq(struct msm_gpu *gpu)
 {
 	int ret;
 
@@ -113,9 +113,20 @@ int msm_gpu_pm_resume(struct msm_gpu *gpu)
 	if (ret)
 		return ret;
 
-	msm_devfreq_resume(gpu);
-
 	gpu->needs_hw_init = true;
+
+	return 0;
+}
+
+int msm_gpu_pm_resume(struct msm_gpu *gpu)
+{
+	int ret;
+
+	ret = msm_gpu_pm_resume_no_devfreq(gpu);
+	if (ret)
+		return ret;
+
+	msm_devfreq_resume(gpu);
 
 	return 0;
 }
