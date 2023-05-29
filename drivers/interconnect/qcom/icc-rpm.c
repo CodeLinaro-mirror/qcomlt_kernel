@@ -274,7 +274,7 @@ static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 	do_div(rate, qn->buswidth);
 	rate = min_t(u64, rate, LONG_MAX);
 
-	for (i = 0; i < qp->num_clks; i++) {
+	for (i = 0; i < qp->num_rate_clks; i++) {
 		if (qp->bus_clk_rate[i] == rate)
 			continue;
 
@@ -344,6 +344,9 @@ int qnoc_probe(struct platform_device *pdev)
 	for (i = 0; i < cd_num; i++)
 		qp->bus_clks[i].id = cds[i];
 	qp->num_clks = cd_num;
+	qp->num_rate_clks = desc->num_rate_clocks;
+	if (!qp->num_rate_clks && cd_num == 2)
+		qp->num_rate_clks = 2;
 
 	qp->type = desc->type;
 	qp->qos_offset = desc->qos_offset;

@@ -31,6 +31,7 @@ enum qcom_icc_type {
 struct qcom_icc_provider {
 	struct icc_provider provider;
 	int num_clks;
+	int num_rate_clks;
 	enum qcom_icc_type type;
 	struct regmap *regmap;
 	unsigned int qos_offset;
@@ -85,6 +86,7 @@ struct qcom_icc_desc {
 	size_t num_nodes;
 	const char * const *clocks;
 	size_t num_clocks;
+	size_t num_rate_clocks;
 	bool has_bus_pd;
 	enum qcom_icc_type type;
 	const struct regmap_config *regmap_cfg;
