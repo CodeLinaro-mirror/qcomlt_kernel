@@ -187,72 +187,43 @@ static int qcom_icc_set_noc_qos(struct icc_node *src, u64 max_bw)
 				  NOC_QOS_MODEn_MASK, mode);
 }
 
-static int qcom_icc_qos_set(struct icc_node *node, u64 sum_bw)
+static int qcom_icc_rpm_set(struct qcom_icc_node *qn, u64 *bw)
 {
-	struct qcom_icc_provider *qp = to_qcom_provider(node->provider);
-	struct qcom_icc_node *qn = node->data;
+	int ret, rpm_ctx = 0;
+	u64 bw_bps;
 
-	dev_dbg(node->provider->dev, "Setting QoS for %s\n", qn->name);
+	if (qn->qos.ap_owned)
+		return 0;
 
-	switch (qp->type) {
-	case QCOM_ICC_BIMC:
-		return qcom_icc_set_bimc_qos(node, sum_bw);
-	case QCOM_ICC_QNOC:
-		return qcom_icc_set_qnoc_qos(node);
-	default:
-		return qcom_icc_set_noc_qos(node, sum_bw);
-	}
-}
+	for (rpm_ctx = 0; rpm_ctx < QCOM_SMD_RPM_STATE_NUM; rpm_ctx++) {
+		bw_bps = icc_units_to_bps(bw[rpm_ctx]);
 
-static int qcom_icc_rpm_set(int mas_rpm_id, int slv_rpm_id, u64 sum_bw)
-{
-	int ret = 0;
-
-	if (mas_rpm_id != -1) {
-		ret = qcom_icc_rpm_smd_send(QCOM_SMD_RPM_ACTIVE_STATE,
-					    RPM_BUS_MASTER_REQ,
-					    mas_rpm_id,
-					    sum_bw);
-		if (ret) {
-			pr_err("qcom_icc_rpm_smd_send mas %d error %d\n",
-			       mas_rpm_id, ret);
-			return ret;
+		if (qn->mas_rpm_id != -1) {
+			ret = qcom_icc_rpm_smd_send(rpm_ctx,
+						    RPM_BUS_MASTER_REQ,
+						    qn->mas_rpm_id,
+						    bw_bps);
+			if (ret) {
+				pr_err("qcom_icc_rpm_smd_send mas %d error %d\n",
+				       qn->mas_rpm_id, ret);
+				return ret;
+			}
 		}
 	}
 
-	if (slv_rpm_id != -1) {
-		ret = qcom_icc_rpm_smd_send(QCOM_SMD_RPM_ACTIVE_STATE,
+	if (qn->slv_rpm_id != -1) {
+		ret = qcom_icc_rpm_smd_send(rpm_ctx,
 					    RPM_BUS_SLAVE_REQ,
-					    slv_rpm_id,
-					    sum_bw);
+					    qn->slv_rpm_id,
+					    bw_bps);
 		if (ret) {
 			pr_err("qcom_icc_rpm_smd_send slv %d error %d\n",
-			       slv_rpm_id, ret);
+			       qn->slv_rpm_id, ret);
 			return ret;
 		}
 	}
 
 	return ret;
-}
-
-static int __qcom_icc_set(struct icc_node *n, struct qcom_icc_node *qn,
-			  u64 sum_bw)
-{
-	int ret;
-
-	if (!qn->qos.ap_owned) {
-		/* send bandwidth request message to the RPM processor */
-		ret = qcom_icc_rpm_set(qn->mas_rpm_id, qn->slv_rpm_id, sum_bw);
-		if (ret)
-			return ret;
-	} else if (qn->qos.qos_mode != NOC_QOS_MODE_INVALID) {
-		/* set bandwidth directly from the AP */
-		ret = qcom_icc_qos_set(n, sum_bw);
-		if (ret)
-			return ret;
-	}
-
-	return 0;
 }
 
 /**
@@ -353,7 +324,6 @@ static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 	struct qcom_icc_provider *qp;
 	struct qcom_icc_node *src_qn = NULL, *dst_qn = NULL;
 	struct icc_provider *provider;
-	u64 sum_bw;
 	u64 active_rate, sleep_rate;
 	u64 agg_avg[QCOM_SMD_RPM_STATE_NUM], agg_peak[QCOM_SMD_RPM_STATE_NUM];
 	u64 max_agg_avg;
@@ -367,13 +337,11 @@ static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 
 	qcom_icc_bus_aggregate(provider, agg_avg, agg_peak, &max_agg_avg);
 
-	sum_bw = icc_units_to_bps(max_agg_avg);
-
-	ret = __qcom_icc_set(src, src_qn, sum_bw);
+	ret = qcom_icc_rpm_set(src_qn, agg_avg);
 	if (ret)
 		return ret;
 	if (dst_qn) {
-		ret = __qcom_icc_set(dst, dst_qn, sum_bw);
+		ret = qcom_icc_rpm_set(dst_qn, agg_avg);
 		if (ret)
 			return ret;
 	}
