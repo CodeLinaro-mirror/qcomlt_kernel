@@ -1761,8 +1761,15 @@
 			msi-map = <0x0 &gic_its 0x5981 0x1>,
 				  <0x100 &gic_its 0x5980 0x1>;
 			msi-map-mask = <0xff00>;
-			interrupts = <GIC_SPI 141 IRQ_TYPE_LEVEL_HIGH>;
-			interrupt-names = "msi";
+			interrupts = <GIC_SPI 141 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 142 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 143 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 147 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "msi0", "msi1", "msi2", "msi3", "msi4", "msi5", "msi6", "msi7";
 			#interrupt-cells = <1>;
 			interrupt-map-mask = <0 0 0 0x7>;
 			interrupt-map = <0 0 0 1 &intc 0 0 0 149 IRQ_TYPE_LEVEL_HIGH>, /* int_a */
@@ -3176,6 +3183,104 @@
 					drive-strength = <2>;
 					bias-pull-up;
 				};
+			};
+
+			cam_sensor_mclk0_default: cam-sensor-mclk0-default-state {
+				pins = "gpio100";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-disable;
+			};
+
+			cam_sensor_mclk0_sleep: cam-sensor-mclk0-sleep-state {
+				pins = "gpio100";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-pull-down;
+			};
+
+			cam_sensor_mclk1_default: cam-sensor-mclk1-default-state {
+				pins = "gpio101";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-disable;
+			};
+
+			cam_sensor_mclk1_sleep: cam-sensor-mclk1-sleep-state {
+				pins = "gpio101";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-pull-down;
+			};
+
+			cam_sensor_mclk2_default: cam-sensor-mclk2-default-state {
+				pins = "gpio102";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-disable;
+			};
+
+			cam_sensor_mclk2_sleep: cam-sensor-mclk2-sleep-state {
+				pins = "gpio102";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-pull-down;
+			};
+
+			cam_sensor_mclk3_default: cam-sensor-mclk3-default-state {
+				pins = "gpio103";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-disable;
+			};
+
+			cam_sensor_mclk3_sleep: cam-sensor-mclk3-sleep-state {
+				pins = "gpio103";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-pull-down;
+			};
+
+			cam_sensor_mclk4_default: cam-sensor-mclk4-default-state {
+				pins = "gpio104";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-disable;
+			};
+
+			cam_sensor_mclk4_sleep: cam-sensor-mclk4-sleep-state {
+				pins = "gpio104";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-pull-down;
+			};
+
+			cam_sensor_mclk5_default: cam-sensor-mclk5-default-state {
+				pins = "gpio105";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-disable;
+			};
+
+			cam_sensor_mclk5_sleep: cam-sensor-mclk5-sleep-state {
+				pins = "gpio105";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-pull-down;
+			};
+
+			cam_sensor_mclk6_default: cam-sensor-mclk6-default-state {
+				pins = "gpio106";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-disable;
+			};
+
+			cam_sensor_mclk6_sleep: cam-sensor-mclk6-sleep-state {
+				pins = "gpio106";
+				function = "cam_mclk";
+				drive-strength = <6>;
+				bias-pull-down;
 			};
 
 			cci0_default: cci0-default-state {
