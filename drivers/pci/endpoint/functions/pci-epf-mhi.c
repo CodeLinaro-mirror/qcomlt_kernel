@@ -401,7 +401,7 @@ static int pci_epf_mhi_edma_write(struct mhi_ep_cntrl *mhi_cntrl, void *from,
 	}
 
 err_unmap:
-	dma_unmap_single(dma_dev, src_addr, size, DMA_FROM_DEVICE);
+	dma_unmap_single(dma_dev, src_addr, size, DMA_TO_DEVICE);
 err_unlock:
 	mutex_unlock(&epf_mhi->lock);
 
