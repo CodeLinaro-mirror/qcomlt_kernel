@@ -137,4 +137,6 @@ static inline int qcom_scm_qseecom_app_send(u32 app_id, void *req,
 
 #endif /* CONFIG_QCOM_QSEECOM */
 
+extern int qcom_scm_tsens_reinit(void);
+
 #endif
