@@ -64,6 +64,7 @@ int qcom_snd_sdw_prepare(struct snd_pcm_substream *substream,
 	switch (cpu_dai->id) {
 	case WSA_CODEC_DMA_RX_0:
 	case WSA_CODEC_DMA_RX_1:
+	case WSA_CODEC_DMA_TX_0:
 	case RX_CODEC_DMA_RX_0:
 	case RX_CODEC_DMA_RX_1:
 	case TX_CODEC_DMA_TX_0:
@@ -113,6 +114,7 @@ int qcom_snd_sdw_hw_params(struct snd_pcm_substream *substream,
 
 	switch (cpu_dai->id) {
 	case WSA_CODEC_DMA_RX_0:
+	case WSA_CODEC_DMA_TX_0:
 	case RX_CODEC_DMA_RX_0:
 	case RX_CODEC_DMA_RX_1:
 	case TX_CODEC_DMA_TX_0:
@@ -141,6 +143,7 @@ int qcom_snd_sdw_hw_free(struct snd_pcm_substream *substream,
 	switch (cpu_dai->id) {
 	case WSA_CODEC_DMA_RX_0:
 	case WSA_CODEC_DMA_RX_1:
+	case WSA_CODEC_DMA_TX_0:
 	case RX_CODEC_DMA_RX_0:
 	case RX_CODEC_DMA_RX_1:
 	case TX_CODEC_DMA_TX_0:
