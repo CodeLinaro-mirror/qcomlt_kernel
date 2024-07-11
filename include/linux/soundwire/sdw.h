@@ -840,6 +840,10 @@ struct sdw_master_ops {
 	enum sdw_command_response (*xfer_msg_defer)(struct sdw_bus *bus);
 	int (*set_bus_conf)(struct sdw_bus *bus,
 			    struct sdw_bus_params *params);
+
+	int (*set_master_channel_map)(struct sdw_bus *bus, int *ch_mask,
+			unsigned int port_num);
+
 	int (*pre_bank_switch)(struct sdw_bus *bus);
 	int (*post_bank_switch)(struct sdw_bus *bus);
 	u32 (*read_ping_status)(struct sdw_bus *bus);
@@ -1034,6 +1038,9 @@ int sdw_bus_exit_clk_stop(struct sdw_bus *bus);
 
 int sdw_compare_devid(struct sdw_slave *slave, struct sdw_slave_id id);
 void sdw_extract_slave_id(struct sdw_bus *bus, u64 addr, struct sdw_slave_id *id);
+
+int sdw_set_channel_map_stream(struct sdw_stream_runtime *stream,
+			       int *ch_mask, unsigned int active_port_num);
 
 #if IS_ENABLED(CONFIG_SOUNDWIRE)
 
