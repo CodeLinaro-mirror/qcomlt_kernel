@@ -1521,6 +1521,8 @@ static void wsa_macro_enable_disable_vi_feedback(struct snd_soc_component *compo
 	struct wsa_macro *wsa = snd_soc_component_get_drvdata(component);
 	u32 tx_reg0, tx_reg1;
 
+	pr_err("AAA %s:%d speaker enable = %d, rate = %u\n", __func__, __LINE__, enable, rate);
+
 	if (test_bit(WSA_MACRO_TX0, &wsa->active_ch_mask[WSA_MACRO_AIF_VI])) {
 		tx_reg0 = CDC_WSA_TX0_SPKR_PROT_PATH_CTL;
 		tx_reg1 = CDC_WSA_TX1_SPKR_PROT_PATH_CTL;
@@ -1564,6 +1566,8 @@ static int wsa_macro_enable_vi_feedback(struct snd_soc_dapm_widget *w,
 		rate_val = CDC_WSA_TX_SPKR_PROT_PCM_RATE_8K;
 		break;
 	}
+
+	pr_err("AAA %s:%d rate = %u\n", __func__, __LINE__, wsa->pcm_rate_vi);
 
 	switch (event) {
 	case SND_SOC_DAPM_POST_PMU:
@@ -2356,6 +2360,8 @@ static int wsa_macro_vi_feed_mixer_put(struct snd_kcontrol *kcontrol,
 	u32 spk_tx_id = mixer->shift;
 	u32 dai_id = widget->shift;
 
+	pr_err("AAA %s:%d tx_id=%d, enable=%d\n", __func__, __LINE__,
+	       spk_tx_id, enable);
 	if (enable) {
 		if (spk_tx_id == WSA_MACRO_TX0 &&
 			!test_bit(WSA_MACRO_TX0,
@@ -2387,6 +2393,8 @@ static int wsa_macro_vi_feed_mixer_put(struct snd_kcontrol *kcontrol,
 			wsa->active_ch_cnt[dai_id]--;
 		}
 	}
+	pr_err("AAA %s:%d tx_id=%d, enable=%d -> %lu\n", __func__, __LINE__,
+	       spk_tx_id, enable, wsa->active_ch_cnt[WSA_MACRO_AIF_VI]);
 	snd_soc_dapm_mixer_update_power(widget->dapm, kcontrol, enable, NULL);
 
 	return 0;
