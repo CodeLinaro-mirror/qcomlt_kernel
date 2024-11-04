@@ -53,6 +53,17 @@
 		vdd-mic-bias-supply = <&vreg_bob1>;
 
 		#sound-dai-cells = <1>;
+
+#if 0
+		mode-switch;
+		orientation-switch;
+
+		port {
+			wcd_codec_headset_in: endpoint {
+				remote-endpoint = <&wcd_usbss_headset_out>;
+			};
+		};
+#endif
 	};
 
 	chosen {
