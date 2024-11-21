@@ -612,6 +612,18 @@
 		};
 
 		/* TODO: smem mailbox in and out */
+		/*
+		mailbox-out {
+			qcom,entry-name = "smem-mailbox";
+			#qcom,smem-state-cells = <1>;
+		};
+
+		mailbox-in {
+			qcom,entry-name = "smem-mailbox";
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+		*/
 	};
 
 	soc: soc@0 {
