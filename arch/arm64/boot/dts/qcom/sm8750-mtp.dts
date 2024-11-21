@@ -953,15 +953,15 @@
 	status = "okay";
 };
 &remoteproc_cdsp {
-	firmware-name = "qcom/sm8750/cdsp.mbn",
-			"qcom/sm8750/cdsp_dtb.mbn";
+	firmware-name = "qcom/sm8750/cdsp.mdt",
+			"qcom/sm8750/cdsp_dtb.mdt";
 
 	status = "okay";
 };
 
 &remoteproc_mpss {
-	firmware-name = "qcom/sm8750/modem.mbn",
-			"qcom/sm8750/modem_dtb.mbn";
+	firmware-name = "qcom/sm8750/modem.mdt",
+			"qcom/sm8750/modem_dtb.mdt";
 
 	/* Modem crashes with "DOG detects stalled initialization" */
 	status = "fail";
