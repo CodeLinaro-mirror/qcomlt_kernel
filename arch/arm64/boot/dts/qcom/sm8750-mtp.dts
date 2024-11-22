@@ -952,6 +952,7 @@
 
 	status = "okay";
 };
+
 &remoteproc_cdsp {
 	firmware-name = "qcom/sm8750/cdsp.mdt",
 			"qcom/sm8750/cdsp_dtb.mdt";
@@ -966,7 +967,6 @@
 	/* Modem crashes with "DOG detects stalled initialization" */
 	status = "fail";
 };
-
 
 &swr0 {
 	status = "okay";
