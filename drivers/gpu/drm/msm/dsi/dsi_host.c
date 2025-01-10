@@ -307,8 +307,6 @@ int dsi_clk_init_6g_v2_9(struct msm_dsi_host *msm_host)
 		return dev_err_probe(dev, PTR_ERR(msm_host->dsi_pll_pixel_clk),
 				     "can't get dsi_pll_pixel clock\n");
 
-	pr_err("AAA %s:%d\n", __func__, __LINE__);
-
 	return 0;
 }
 
