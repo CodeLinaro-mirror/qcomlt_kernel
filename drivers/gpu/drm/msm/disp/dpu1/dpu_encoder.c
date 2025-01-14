@@ -2183,8 +2183,8 @@ static void dpu_encoder_helper_reset_mixers(struct dpu_encoder_phys *phys_enc)
 	memset(&mixer, 0, sizeof(mixer));
 
 	/* reset all mixers for this encoder */
-	if (phys_enc->hw_ctl->ops.clear_all_blendstages)
-		phys_enc->hw_ctl->ops.clear_all_blendstages(phys_enc->hw_ctl);
+	if (ctl->ops.clear_all_blendstages)
+		ctl->ops.clear_all_blendstages(ctl);
 
 	global_state = dpu_kms_get_existing_global_state(phys_enc->dpu_kms);
 
@@ -2193,12 +2193,12 @@ static void dpu_encoder_helper_reset_mixers(struct dpu_encoder_phys *phys_enc)
 
 	for (i = 0; i < num_lm; i++) {
 		hw_mixer[i] = to_dpu_hw_mixer(hw_lm[i]);
-		if (phys_enc->hw_ctl->ops.update_pending_flush_mixer)
-			phys_enc->hw_ctl->ops.update_pending_flush_mixer(ctl, hw_mixer[i]->idx);
+		if (ctl->ops.update_pending_flush_mixer)
+			ctl->ops.update_pending_flush_mixer(ctl, hw_mixer[i]->idx);
 
 		/* clear all blendstages */
-		if (phys_enc->hw_ctl->ops.setup_blendstage)
-			phys_enc->hw_ctl->ops.setup_blendstage(ctl, hw_mixer[i]->idx, NULL);
+		if (ctl->ops.setup_blendstage)
+			ctl->ops.setup_blendstage(ctl, hw_mixer[i]->idx, NULL);
 	}
 }
 
