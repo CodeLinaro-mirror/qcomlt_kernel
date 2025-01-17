@@ -307,6 +307,8 @@ int dsi_clk_init_6g_v2_9(struct msm_dsi_host *msm_host)
 		return dev_err_probe(dev, PTR_ERR(msm_host->dsi_pll_pixel_clk),
 				     "can't get dsi_pll_pixel clock\n");
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
+
 	return 0;
 }
 
@@ -444,8 +446,12 @@ int dsi_link_clk_set_rate_6g_v2_9(struct msm_dsi_host *msm_host)
 
 	clk_disable_unprepare(msm_host->dsi_pll_pixel_clk);
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
+
 out_disable_byte_clk:
 	clk_disable_unprepare(msm_host->dsi_pll_byte_clk);
+
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 
 	return ret;
 }
@@ -656,6 +662,9 @@ unsigned long dsi_byte_clk_get_rate(struct mipi_dsi_host *host, bool is_bonded_d
 	else
 		pclk_bpp = mult_frac(pclk_rate, bpp, 8 * lanes);
 
+	pr_err("AAA %s:%d Looking for pclk_rate: %lu (cphy: %d, bpp: %u, lanes: %u) -> %lu\n",
+	       __func__, __LINE__, pclk_rate, msm_host->cphy_mode, bpp, lanes, pclk_bpp);
+
 	return pclk_bpp;
 }
 
@@ -665,7 +674,7 @@ static void dsi_calc_pclk(struct msm_dsi_host *msm_host, bool is_bonded_dsi)
 	msm_host->byte_clk_rate = dsi_byte_clk_get_rate(&msm_host->base, is_bonded_dsi,
 							msm_host->mode);
 
-	DBG("pclk=%lu, bclk=%lu", msm_host->pixel_clk_rate,
+	pr_err("AAA pclk=%lu, bclk=%lu", msm_host->pixel_clk_rate,
 				msm_host->byte_clk_rate);
 }
 
@@ -678,6 +687,8 @@ int dsi_calc_clk_rate_6g(struct msm_dsi_host *msm_host, bool is_bonded_dsi)
 
 	dsi_calc_pclk(msm_host, is_bonded_dsi);
 	msm_host->esc_clk_rate = clk_get_rate(msm_host->esc_clk);
+	pr_err("AAA %s:%d esc_clk: %lu\n", __func__, __LINE__, msm_host->esc_clk_rate);
+
 	return 0;
 }
 
@@ -1705,10 +1716,12 @@ static int dsi_host_attach(struct mipi_dsi_host *host,
 	if (dsi->dsc)
 		msm_host->dsc = dsi->dsc;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	ret = dsi_dev_attach(msm_host->pdev);
 	if (ret)
 		return ret;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	DBG("id=%d", msm_host->id);
 
 	return 0;

@@ -840,6 +840,7 @@ static void dpu_crtc_atomic_begin(struct drm_crtc *crtc,
 	struct dpu_crtc_state *cstate = to_dpu_crtc_state(crtc->state);
 	struct drm_encoder *encoder;
 
+	pr_err("AAA BBB %s:%d\n", __func__, __LINE__);
 	if (!crtc->state->enable) {
 		DRM_DEBUG_ATOMIC("crtc%d -> enable %d, skip atomic_begin\n",
 				crtc->base.id, crtc->state->enable);
@@ -862,7 +863,9 @@ static void dpu_crtc_atomic_begin(struct drm_crtc *crtc,
 	if (unlikely(!cstate->num_mixers))
 		return;
 
+	pr_err("AAA BBB %s:%d\n", __func__, __LINE__);
 	_dpu_crtc_blend_setup(crtc);
+	pr_err("AAA BBB %s:%d\n", __func__, __LINE__);
 
 	_dpu_crtc_setup_cp_blocks(crtc);
 

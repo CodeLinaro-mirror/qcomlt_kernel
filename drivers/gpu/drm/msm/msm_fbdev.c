@@ -100,6 +100,7 @@ int msm_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 	uint32_t format;
 	int ret, pitch;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	format = drm_mode_legacy_fb_format(sizes->surface_bpp, sizes->surface_depth);
 
 	DBG("create fbdev: %dx%d@%d (%dx%d)", sizes->surface_width,
@@ -110,6 +111,7 @@ int msm_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 	fb = msm_alloc_stolen_fb(dev, sizes->surface_width,
 			sizes->surface_height, pitch, format);
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	if (IS_ERR(fb)) {
 		DRM_DEV_ERROR(dev->dev, "failed to allocate fb\n");
 		return PTR_ERR(fb);
@@ -128,6 +130,7 @@ int msm_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 		goto fail;
 	}
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	fbi = drm_fb_helper_alloc_info(helper);
 	if (IS_ERR(fbi)) {
 		DRM_DEV_ERROR(dev->dev, "failed to allocate fb info\n");
@@ -135,6 +138,7 @@ int msm_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 		goto fail;
 	}
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	DBG("fbi=%p, dev=%p", fbi, dev);
 
 	helper->funcs = &msm_fbdev_helper_funcs;
@@ -144,6 +148,7 @@ int msm_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 
 	drm_fb_helper_fill_info(fbi, helper, sizes);
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	fbi->screen_buffer = msm_gem_get_vaddr(bo);
 	if (IS_ERR(fbi->screen_buffer)) {
 		ret = PTR_ERR(fbi->screen_buffer);
@@ -153,6 +158,7 @@ int msm_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 	fbi->fix.smem_start = paddr;
 	fbi->fix.smem_len = bo->size;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	DBG("par=%p, %dx%d", fbi->par, fbi->var.xres, fbi->var.yres);
 	DBG("allocated %dx%d fb", fb->width, fb->height);
 

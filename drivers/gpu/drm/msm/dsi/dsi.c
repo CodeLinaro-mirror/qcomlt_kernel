@@ -158,6 +158,7 @@ static const struct component_ops dsi_ops = {
 
 int dsi_dev_attach(struct platform_device *pdev)
 {
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	return component_add(&pdev->dev, &dsi_ops);
 }
 

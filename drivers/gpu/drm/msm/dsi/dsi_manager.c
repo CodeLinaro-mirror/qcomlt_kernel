@@ -405,7 +405,18 @@ static enum drm_mode_status dsi_mgr_bridge_mode_valid(struct drm_bridge *bridge,
 
 	byte_clk_rate = dsi_byte_clk_get_rate(host, IS_BONDED_DSI(), mode);
 
+	opp = dev_pm_opp_find_freq_floor(&pdev->dev, &byte_clk_rate);
+	dev_err(&pdev->dev, "AAA %s:%d Looking for byte_clk %lu: %p\n",
+	       __func__, __LINE__, byte_clk_rate, opp);
+	if (!IS_ERR(opp))
+		dev_err(&pdev->dev, "AAA %s:%d Looking for byte_clk %lu: got %lu\n",
+		       __func__, __LINE__, byte_clk_rate, dev_pm_opp_get_freq_indexed(opp, 0));
+
+	byte_clk_rate = dsi_byte_clk_get_rate(host, IS_BONDED_DSI(), mode);
 	opp = dev_pm_opp_find_freq_ceil(&pdev->dev, &byte_clk_rate);
+	dev_err(&pdev->dev, "AAA %s:%d Looking for byte_clk %lu: %p\n",
+	       __func__, __LINE__, byte_clk_rate, opp);
+
 	if (!IS_ERR(opp)) {
 		dev_pm_opp_put(opp);
 	} else if (PTR_ERR(opp) == -ERANGE) {

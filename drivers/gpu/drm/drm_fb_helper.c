@@ -1484,19 +1484,24 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 	sizes->fb_width = (u32)-1;
 	sizes->fb_height = (u32)-1;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	drm_client_for_each_modeset(mode_set, client) {
 		struct drm_crtc *crtc = mode_set->crtc;
 		struct drm_plane *plane = crtc->primary;
 
 		drm_dbg_kms(dev, "test CRTC %u primary plane\n", drm_crtc_index(crtc));
 
+		pr_err("AAA %s:%d plane=%s, type=%u\n", __func__, __LINE__,
+		       plane->name, plane->type);
 		drm_connector_list_iter_begin(fb_helper->dev, &conn_iter);
 		drm_client_for_each_connector_iter(connector, &conn_iter) {
 			struct drm_cmdline_mode *cmdline_mode = &connector->cmdline_mode;
 
+			pr_err("AAA %s:%d name=%s\n", __func__, __LINE__, cmdline_mode->name);
 			if (!cmdline_mode->bpp_specified)
 				continue;
 
+			pr_err("AAA %s:%d\n", __func__, __LINE__);
 			surface_format = drm_fb_helper_find_format(fb_helper,
 								   plane->format_types,
 								   plane->format_count,
@@ -1506,6 +1511,7 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 		}
 		drm_connector_list_iter_end(&conn_iter);
 
+		pr_err("AAA %s:%d\n", __func__, __LINE__);
 		if (surface_format != DRM_FORMAT_INVALID)
 			break; /* found supported format */
 
@@ -1518,6 +1524,7 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 			break; /* found supported format */
 	}
 
+	pr_err("AAA %s:%d surface_format=0x%x\n", __func__, __LINE__, surface_format);
 	if (surface_format == DRM_FORMAT_INVALID) {
 		/*
 		 * If none of the given color modes works, fall back
@@ -1532,6 +1539,8 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 	sizes->surface_bpp = drm_format_info_bpp(info, 0);
 	sizes->surface_depth = info->depth;
 
+	pr_err("AAA %s:%d bpp=%d depth=%d\n", __func__, __LINE__,
+	       sizes->surface_bpp, sizes->surface_depth);
 	/* first up get a count of crtcs now in use and new min/maxes width/heights */
 	crtc_count = 0;
 	drm_client_for_each_modeset(mode_set, client) {
@@ -1545,6 +1554,8 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 
 		desired_mode = mode_set->mode;
 
+		pr_err("AAA %s:%d mode_set x=%u, y=%u\n", __func__, __LINE__,
+		       mode_set->x, mode_set->y);
 		if (!desired_mode)
 			continue;
 
@@ -1553,6 +1564,7 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 		x = mode_set->x;
 		y = mode_set->y;
 
+		pr_err("AAA %s:%d x=%d y=%d\n", __func__, __LINE__, x, y);
 		sizes->surface_width  =
 			max_t(u32, desired_mode->hdisplay + x, sizes->surface_width);
 		sizes->surface_height =
@@ -1561,6 +1573,8 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 		for (j = 0; j < mode_set->num_connectors; j++) {
 			struct drm_connector *connector = mode_set->connectors[j];
 
+			pr_err("AAA %s:%d connector[%d], has_tile=%d, h=%d, v=%d\n", __func__, __LINE__,
+			       j, connector->has_tile, connector->tile_h_size, connector->tile_v_size);
 			if (connector->has_tile &&
 			    desired_mode->hdisplay == connector->tile_h_size &&
 			    desired_mode->vdisplay == connector->tile_v_size) {
@@ -1577,6 +1591,8 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 			sizes->fb_height = min_t(u32, desired_mode->vdisplay + y, sizes->fb_height);
 	}
 
+	pr_err("AAA %s:%d crtc_count=%d y=%d x=%d\n", __func__, __LINE__,
+	       crtc_count, sizes->fb_width, sizes->fb_height);
 	if (crtc_count == 0 || sizes->fb_width == -1 || sizes->fb_height == -1) {
 		drm_info(dev, "Cannot find any crtc or sizes\n");
 		return -EAGAIN;
@@ -1593,13 +1609,16 @@ static int drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 	struct drm_mode_config *config = &dev->mode_config;
 	int ret;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	mutex_lock(&client->modeset_mutex);
 	ret = __drm_fb_helper_find_sizes(fb_helper, sizes);
 	mutex_unlock(&client->modeset_mutex);
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	if (ret)
 		return ret;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	/* Handle our overallocation */
 	sizes->surface_height *= drm_fbdev_overalloc;
 	sizes->surface_height /= 100;
@@ -1632,6 +1651,7 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper)
 		return ret;
 	}
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	/* push down into drivers */
 	if (dev->driver->fbdev_probe)
 		ret = dev->driver->fbdev_probe(fb_helper, &sizes);
@@ -1644,6 +1664,7 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper)
 
 	info = fb_helper->info;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	/* Set the fb info for vgaswitcheroo clients. Does nothing otherwise. */
 	if (dev_is_pci(info->device))
 		vga_switcheroo_client_fb_set(to_pci_dev(info->device), info);
@@ -1768,6 +1789,7 @@ static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 	}
 	mutex_unlock(&client->modeset_mutex);
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	drm_connector_list_iter_begin(fb_helper->dev, &conn_iter);
 	drm_client_for_each_connector_iter(connector, &conn_iter) {
 
@@ -1780,6 +1802,7 @@ static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 	}
 	drm_connector_list_iter_end(&conn_iter);
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	switch (sw_rotations) {
 	case DRM_MODE_ROTATE_0:
 		info->fbcon_rotate_hint = FB_ROTATE_UR;
@@ -1801,6 +1824,7 @@ static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 		 */
 		info->fbcon_rotate_hint = FB_ROTATE_UR;
 	}
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 }
 
 /* Note: Drops fb_helper->lock before returning. */
@@ -1815,8 +1839,10 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper)
 	width = dev->mode_config.max_width;
 	height = dev->mode_config.max_height;
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	drm_client_modeset_probe(&fb_helper->client, width, height);
 	ret = drm_fb_helper_single_fb_probe(fb_helper);
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	if (ret < 0) {
 		if (ret == -EAGAIN) {
 			fb_helper->deferred_setup = true;
@@ -1826,7 +1852,9 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper)
 
 		return ret;
 	}
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	drm_setup_crtcs_fb(fb_helper);
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 
 	fb_helper->deferred_setup = false;
 
@@ -1838,6 +1866,7 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper)
 	 * register the fbdev emulation instance in kernel_fb_helper_list. */
 	mutex_unlock(&fb_helper->lock);
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	ret = register_framebuffer(info);
 	if (ret < 0)
 		return ret;
@@ -1852,6 +1881,7 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper)
 	list_add(&fb_helper->kernel_fb_list, &kernel_fb_helper_list);
 	mutex_unlock(&kernel_fb_helper_lock);
 
+	pr_err("AAA %s:%d\n", __func__, __LINE__);
 	return 0;
 }
 

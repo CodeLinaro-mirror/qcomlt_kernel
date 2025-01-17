@@ -722,7 +722,7 @@ static int __component_add(struct device *dev, const struct component_ops *ops,
 	component->dev = dev;
 	component->subcomponent = subcomponent;
 
-	dev_dbg(dev, "adding component (ops %ps)\n", ops);
+	dev_err(dev, "adding component (ops %ps)\n", ops);
 
 	mutex_lock(&component_mutex);
 	list_add_tail(&component->node, &component_list);
