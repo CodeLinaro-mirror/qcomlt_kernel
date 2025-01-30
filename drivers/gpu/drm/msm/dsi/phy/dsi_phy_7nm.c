@@ -335,7 +335,7 @@ static int dsi_pll_7nm_vco_set_rate(struct clk_hw *hw, unsigned long rate,
 	struct dsi_pll_7nm *pll_7nm = to_pll_7nm(hw);
 	struct dsi_pll_config config;
 
-	DBG("DSI PLL%d rate=%lu, parent's=%lu", pll_7nm->phy->id, rate,
+	pr_err("DSI PLL%d rate=%lu, parent's=%lu", pll_7nm->phy->id, rate,
 	    parent_rate);
 
 	pll_7nm->vco_current_rate = rate;
@@ -354,6 +354,11 @@ static int dsi_pll_7nm_vco_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	/* flush, ensure all register writes are done*/
 	wmb();
+
+	pr_err("%s:%d AAA CCC DSI PLL%d returning vco rate = %llu, dec = %x, frac = %x",
+		__func__, __LINE__,
+		pll_7nm->phy->id, pll_7nm->vco_current_rate,
+		config.decimal_div_start, config.frac_div_start);
 
 	return 0;
 }
@@ -434,8 +439,16 @@ static int dsi_pll_7nm_vco_prepare(struct clk_hw *hw)
 	struct dsi_pll_7nm *pll_7nm = to_pll_7nm(hw);
 	int rc;
 
-	if (dsi_pll_7nm_vco_recalc_rate(hw, VCO_REF_CLK_RATE) == 0)
+	pr_err("%s:%d AAA CCC EEE DSI PLL%d prepare, vco rate = %llu",
+		__func__, __LINE__,
+		pll_7nm->phy->id, pll_7nm->vco_current_rate);
+	if (dsi_pll_7nm_vco_recalc_rate(hw, VCO_REF_CLK_RATE) == 0) {
+
+		pr_err("%s:%d AAA CCC EEE DSI PLL%d prepare, vco rate = %llu",
+			__func__, __LINE__,
+			pll_7nm->phy->id, pll_7nm->vco_current_rate);
 		dsi_pll_7nm_vco_set_rate(hw, pll_7nm->phy->cfg->min_pll_rate, VCO_REF_CLK_RATE);
+	}
 
 	dsi_pll_enable_pll_bias(pll_7nm);
 	if (pll_7nm->slave)
@@ -471,6 +484,10 @@ static int dsi_pll_7nm_vco_prepare(struct clk_hw *hw)
 	dsi_pll_enable_global_clk(pll_7nm);
 	if (pll_7nm->slave)
 		dsi_pll_enable_global_clk(pll_7nm->slave);
+
+	pr_err("%s:%d AAA CCC DSI PLL%d prepare, vco rate = %llu",
+		__func__, __LINE__,
+		pll_7nm->phy->id, pll_7nm->vco_current_rate);
 
 error:
 	return rc;
