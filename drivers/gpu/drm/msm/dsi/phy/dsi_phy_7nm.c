@@ -1006,7 +1006,7 @@ static int dsi_7nm_phy_enable(struct msm_dsi_phy *phy,
 		} else {
 			vreg_ctrl_0 = 0x56;
 			vreg_ctrl_1 = 0x19;
-			glbl_rescode_top_ctrl = less_than_1500_mhz ? 0x3c :  0x03;
+			glbl_rescode_top_ctrl = less_than_1500_mhz ? 0x3d :  0x03;
 			glbl_rescode_bot_ctrl = less_than_1500_mhz ? 0x38 :  0x3c;
 		}
 	} else if ((phy->cfg->quirks & DSI_PHY_7NM_QUIRK_V5_2)) {
@@ -1108,7 +1108,7 @@ static int dsi_7nm_phy_enable(struct msm_dsi_phy *phy,
 
 	/* Select full-rate mode */
 	if (!phy->cphy_mode)
-		writel(0x40, base + REG_DSI_7nm_PHY_CMN_CTRL_2);
+		writel(0x00, base + REG_DSI_7nm_PHY_CMN_CTRL_2);
 
 	ret = dsi_7nm_set_usecase(phy);
 	if (ret) {
