@@ -325,7 +325,7 @@ static void _dpu_crtc_setup_blend_cfg(struct dpu_crtc_mixer *mixer,
 	struct dpu_hw_mixer *lm = mixer->hw_lm;
 	uint32_t blend_op;
 	uint32_t fg_alpha, bg_alpha;
-	struct dpu_mdss_color color = {0xfff, 0x00, 0xfff, 0x00};
+	struct dpu_mdss_color color = {0xff, 0x00, 0x00, 0xff};
 
 	fg_alpha = pstate->base.alpha >> 8;
 	bg_alpha = 0xff - fg_alpha;
