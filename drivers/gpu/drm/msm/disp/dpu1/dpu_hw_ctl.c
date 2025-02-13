@@ -759,8 +759,7 @@ static void dpu_hw_ctl_set_active_lms(struct dpu_hw_ctl *ctx,
 		}
 	}
 
-	// DPU_REG_WRITE(&ctx->hw, CTL_LAYER_ACTIVE, val);
-	DPU_REG_WRITE(&ctx->hw, CTL_LAYER_ACTIVE, 0);
+	DPU_REG_WRITE(&ctx->hw, CTL_LAYER_ACTIVE, val);
 }
 
 /**
