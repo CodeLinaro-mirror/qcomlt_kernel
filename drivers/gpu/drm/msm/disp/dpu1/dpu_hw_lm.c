@@ -227,7 +227,6 @@ static int _set_staged_sspp(u32 stage, struct dpu_hw_stage_cfg *stage_cfg,
 			    int pipes_per_stage, u32 *value)
 {
 	int i;
-	//u32 pipe_type = 0, pipe_id = 0, rec_id = 0, layout = 0;
 	u32 pipe_type = 0, pipe_id = 0, rec_id = 0;
 	u32 src_sel[PIPES_PER_STAGE];
 
@@ -272,17 +271,8 @@ static int _set_staged_sspp(u32 stage, struct dpu_hw_stage_cfg *stage_cfg,
 
 	/* calculate final SWI register value for rec-0 and rec-1 */
 	*value = 0;
-	for (i = 0; i < pipes_per_stage; i++) {
-		//if (src_sel[i] == LM_BG_SRC_SEL_V12_RESET_VALUE)
-		//	continue;
-
-#if 0
-		layout = stage_cfg->layout[stage][i];
-		*value = *value & ~(0xff << (layout * 8));
-		*value |= (src_sel[i] << (layout * 8));
-#endif
+	for (i = 0; i < pipes_per_stage; i++)
 		*value |= src_sel[i] << (i * 8);
-	}
 
 	return 0;
 }

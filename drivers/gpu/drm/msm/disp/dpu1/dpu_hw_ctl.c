@@ -724,25 +724,6 @@ static void dpu_hw_ctl_set_active_pipes(struct dpu_hw_ctl *ctx,
 	DPU_REG_WRITE(&ctx->hw, CTL_PIPE_ACTIVE, val);
 }
 
-/*
-static void dpu_hw_ctl_get_active_pipes(struct dpu_hw_ctl *ctx,
-					unsigned long *active_pipes)
-{
-	int i;
-	u32 val = 0;
-
-	if (active_pipes) {
-		for (i = 0; i < SSPP_MAX; i++) {
-			if (test_bit(i, active_pipes) &&
-				fetch_tbl[i] != CTL_INVALID_BIT)
-				val |= BIT(fetch_tbl[i]);
-		}
-	}
-
-	DPU_REG_WRITE(&ctx->hw, CTL_PIPE_ACTIVE, val);
-}
-*/
-
 static void dpu_hw_ctl_set_active_lms(struct dpu_hw_ctl *ctx,
 				      unsigned long *active_lms)
 {
@@ -826,9 +807,7 @@ struct dpu_hw_ctl *dpu_hw_ctl_init(struct drm_device *dev,
 		c->ops.setup_blendstage = dpu_hw_ctl_setup_blendstage;
 	} else {
 		c->ops.set_active_pipes = dpu_hw_ctl_set_active_pipes;
-		//c->ops.get_active_pipes = dpu_hw_ctl_get_active_pipes;
 		c->ops.set_active_lms = dpu_hw_ctl_set_active_lms;
-		//c->ops.get_active_lms = dpu_hw_ctl_get_active_lms;
 	}
 	c->ops.update_pending_flush_sspp = dpu_hw_ctl_update_pending_flush_sspp;
 	c->ops.update_pending_flush_mixer = dpu_hw_ctl_update_pending_flush_mixer;
