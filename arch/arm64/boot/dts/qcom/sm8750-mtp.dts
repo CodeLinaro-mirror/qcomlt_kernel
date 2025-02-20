@@ -1051,7 +1051,7 @@
 	firmware-name = "qcom/sm8750/modem.mdt",
 			"qcom/sm8750/modem_dtb.mdt";
 
-	/* Modem crashes with "DOG detects stalled initialization" */
+	/* Modem crashes after some time with "DOG detects stalled initialization" */
 	status = "fail";
 };
 
