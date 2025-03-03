@@ -1977,7 +1977,6 @@ int sdw_set_channel_map_stream(struct sdw_stream_runtime *stream,
 
 	struct sdw_master_runtime *m_rt;
 	struct sdw_bus *bus;
-	int i;
 
 	list_for_each_entry(m_rt, &stream->master_list, stream_node) {
 		if(m_rt) {
