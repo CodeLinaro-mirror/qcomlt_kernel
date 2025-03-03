@@ -1307,7 +1307,7 @@ int audioreach_set_media_format(struct q6apm_graph *graph, struct audioreach_mod
 {
 	int rc;
 
-	pr_err("%s:%d AAA module_id = %d\n",
+	pr_err("%s:%d AAA module_id = 0x%x\n",
 	       __func__, __LINE__, module->module_id);
 	switch (module->module_id) {
 	case MODULE_ID_DATA_LOGGING:
