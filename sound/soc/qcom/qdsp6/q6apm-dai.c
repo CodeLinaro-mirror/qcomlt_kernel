@@ -265,7 +265,7 @@ static int q6apm_dai_prepare(struct snd_soc_component *component,
 		int graph_id;
 
 		graph_id = cpu_dai->driver->id;
-		pr_err("%s:%d AAA DAI/graph_id = 0x%x\n",
+		pr_err("%s:%d AAA DAI/graph_id = %d\n",
 		       __func__, __LINE__, graph_id);
 	}
 	ret = q6apm_graph_media_format_pcm(prtd->graph, &cfg);
@@ -381,7 +381,7 @@ static int q6apm_dai_open(struct snd_soc_component *component,
 	if (prtd == NULL)
 		return -ENOMEM;
 
-	pr_err("%s:%d AAA DAI/graph_id = 0x%x\n",
+	pr_err("%s:%d AAA DAI/graph_id = %d\n",
 	       __func__, __LINE__, graph_id);
 	spin_lock_init(&prtd->lock);
 	prtd->substream = substream;
