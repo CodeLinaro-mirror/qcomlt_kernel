@@ -404,6 +404,9 @@ static int __clk_rcg2_configure(struct clk_rcg2 *rcg, const struct freq_tbl *f,
 		return index;
 
 	if (rcg->mnd_width && f->n) {
+		pr_err("%s:%d AAA BBB setting mnd for %pC, mnd_widht=%d, f->n=%d, f=%lu, src=%u\n",
+		       __func__, __LINE__,
+		       hw->clk, rcg->mnd_width, f->n, f->freq, f->src);
 		mask = BIT(rcg->mnd_width) - 1;
 		ret = regmap_update_bits(rcg->clkr.regmap,
 				RCG_M_OFFSET(rcg), mask, f->m);
@@ -508,6 +511,10 @@ static int __clk_rcg2_fm_set_rate(struct clk_hw *hw, unsigned long rate)
 	f_tbl.pre_div = conf->pre_div;
 	f_tbl.m = conf->m;
 	f_tbl.n = conf->n;
+
+	pr_err("%s:%d AAA BBB f->n for %pC, mnd_widht=%d, f->n=%d, f=%lu, src=%u\n",
+		       __func__, __LINE__,
+		       hw->clk, rcg->mnd_width, conf->n, f->freq, conf->src);
 
 	return clk_rcg2_configure(rcg, &f_tbl);
 }
@@ -738,6 +745,9 @@ static int clk_edp_pixel_set_rate(struct clk_hw *hw, unsigned long rate,
 		f.m = frac->num;
 		f.n = frac->den;
 
+		pr_err("%s:%d AAA BBB for %pC, mnd_widht=%d, f->n=%d, f=%lu, src=%u\n",
+		       __func__, __LINE__,
+		       hw->clk, rcg->mnd_width, f.n, f.freq, f.src);
 		return clk_rcg2_configure(rcg, &f);
 	}
 
@@ -842,6 +852,9 @@ static int clk_byte_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	f.pre_div = div;
 
+	pr_err("%s:%d AAA BBB for %pC, mnd_widht=%d, f->n=%d, f=%lu, src=%u\n",
+	       __func__, __LINE__,
+	       hw->clk, rcg->mnd_width, f.n, f.freq, f.src);
 	return clk_rcg2_configure(rcg, &f);
 }
 
@@ -908,6 +921,10 @@ static int clk_byte2_set_rate(struct clk_hw *hw, unsigned long rate,
 	for (i = 0; i < num_parents; i++) {
 		if (cfg == rcg->parent_map[i].cfg) {
 			f.src = rcg->parent_map[i].src;
+
+	pr_err("%s:%d AAA BBB for %pC, mnd_widht=%d, f->n=%d, f=%lu, src=%u\n",
+	       __func__, __LINE__,
+	       hw->clk, rcg->mnd_width, f.n, f.freq, f.src);
 			return clk_rcg2_configure(rcg, &f);
 		}
 	}
@@ -987,6 +1004,10 @@ static int clk_pixel_set_rate(struct clk_hw *hw, unsigned long rate,
 			break;
 		}
 
+	pr_err("%s:%d AAA BBB for %pC, rate=%lu, parent rate=%lu, num_parents=%d, f.src=%u\n",
+		       __func__, __LINE__,
+			hw->clk, rate, parent_rate, num_parents, f.src);
+
 	for (; frac->num; frac++) {
 		request = (rate * frac->den) / frac->num;
 
@@ -1000,7 +1021,11 @@ static int clk_pixel_set_rate(struct clk_hw *hw, unsigned long rate,
 		f.pre_div >>= CFG_SRC_DIV_SHIFT;
 		f.pre_div &= mask;
 		f.m = frac->num;
-		f.n = frac->den;
+		//f.n = frac->den;
+
+		pr_err("%s:%d AAA BBB for %pC, mnd_widht=%d, f->n=%d, f=%lu, src=%u\n",
+		       __func__, __LINE__,
+			hw->clk, rcg->mnd_width, f.n, f.freq, f.src);
 
 		return clk_rcg2_configure(rcg, &f);
 	}
