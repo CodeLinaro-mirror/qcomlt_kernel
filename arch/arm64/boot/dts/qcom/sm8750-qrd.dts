@@ -839,7 +839,6 @@
 		vdd-io-supply = <&vreg_l2i_1p2>;
 
 		/*
-		// TODO
 		 * WSA8845 Port 1 (DAC)     <=> SWR0 Port 1 (SPKR_L)
 		 * WSA8845 Port 2 (COMP)    <=> SWR0 Port 2 (SPKR_L_COMP)
 		 * WSA8845 Port 3 (BOOST)   <=> SWR0 Port 3 (SPKR_L_BOOST)
@@ -863,7 +862,6 @@
 		vdd-io-supply = <&vreg_l2i_1p2>;
 
 		/*
-		// TODO
 		 * WSA8845 Port 1 (DAC)     <=> SWR0 Port 4 (SPKR_R)
 		 * WSA8845 Port 2 (COMP)    <=> SWR0 Port 5 (SPKR_R_COMP)
 		 * WSA8845 Port 3 (BOOST)   <=> SWR0 Port 6 (SPKR_R_BOOST)
