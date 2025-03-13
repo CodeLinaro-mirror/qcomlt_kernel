@@ -101,6 +101,7 @@ static struct clk_alpha_pll disp_cc_pll0 = {
 				.index = DT_BI_TCXO,
 			},
 			.num_parents = 1,
+			.flags = CLK_GET_RATE_NOCACHE,
 			.ops = &clk_alpha_pll_taycan_elu_ops,
 		},
 	},
@@ -693,7 +694,7 @@ static struct clk_rcg2 disp_cc_mdss_mdp_clk_src = {
 		.name = "disp_cc_mdss_mdp_clk_src",
 		.parent_data = disp_cc_parent_data_9,
 		.num_parents = ARRAY_SIZE(disp_cc_parent_data_9),
-		.flags = CLK_SET_RATE_PARENT,
+		.flags = CLK_GET_RATE_NOCACHE | CLK_SET_RATE_PARENT,
 		/*
 		 * TODO: Downstream does not manage the clock directly, but
 		 * places votes via new hardware block called "cesta".
