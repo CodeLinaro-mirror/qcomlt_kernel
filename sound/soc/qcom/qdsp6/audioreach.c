@@ -1488,7 +1488,6 @@ int audioreach_set_media_format(struct q6apm_graph *graph, struct audioreach_mod
 						   PARAM_ID_SP_OP_MODE_CALIBRATION);
 		pr_err("%s:%d AAA module_id = MODULE_ID_SPEAKER_PROTECTION rc=%d\n",
 			__func__, __LINE__, rc);
-		rc = 0;
 		break;
 	case MODULE_ID_SPEAKER_PROTECTION_VI:
 		pr_err("%s:%d AAA module_id = MODULE_ID_SPEAKER_PROTECTION_VI\n",
@@ -1496,7 +1495,6 @@ int audioreach_set_media_format(struct q6apm_graph *graph, struct audioreach_mod
 		rc = audioreach_speaker_protection_vi(graph, module, cfg);
 		pr_err("%s:%d AAA module_id = MODULE_ID_SPEAKER_PROTECTION_VI rc=%d\n",
 			__func__, __LINE__, rc);
-		rc = 0;
 		break;
 
 	default:
