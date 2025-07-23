@@ -216,8 +216,8 @@ static int debug_kinfo_probe(struct platform_device *pdev)
 {
 	struct device_node *mem_region;
 	struct reserved_mem *rmem;
-	struct kernel_info *info = kinfo->info;
-	struct kernel_all_info *all_info = kinfo->all_info_addr;
+	struct kernel_info *info;
+	struct kernel_all_info *all_info;
 
 	mem_region = of_parse_phandle(pdev->dev.of_node, "memory-region", 0);
 	if (!mem_region) {
@@ -255,9 +255,10 @@ static int debug_kinfo_probe(struct platform_device *pdev)
 	strscpy(kinfo->kinfo_be.name, "debug_kinfo");
 	kinfo->kinfo_be.register_region = register_kinfo_region;
 	kinfo->kinfo_be.unregister_region = unregister_kinfo_region;
-
 	kinfo->all_info_addr = rmem->priv;
 	kinfo->all_info_size = rmem->size;
+
+	all_info = kinfo->all_info_addr;
 
 	memset(kinfo->all_info_addr, 0, sizeof(struct kernel_all_info));
 	info = &all_info->info;
